@@ -52,7 +52,9 @@ def make_row2(data_dict_entry, col_names):
     ])
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(__name__,
+                external_stylesheets=[dbc.themes.BOOTSTRAP],
+                url_base_pathname='/gpxrun/')
 server = app.server
 intro_text = """
 ## GPX Based Workout Summary
