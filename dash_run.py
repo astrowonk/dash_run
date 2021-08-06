@@ -9,8 +9,6 @@ import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_table
-import os
 import dash_bootstrap_components as dbc
 
 
@@ -151,9 +149,13 @@ def parse_contents(contents, filename, distance_input):
         html.H3('Splits'),
         html.Ul([
             html.
-            Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val)}"
+            Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val):>9}"
                ) for key, val in data_dict.items() if 'split' in key
-        ]),
+        ],
+                style={
+                    'font-family': 'monospace',
+                    'font-size': 24
+                }),
         html.Hr(),  # horizontal line
     ])
 
