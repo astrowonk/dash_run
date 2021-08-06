@@ -8,4 +8,4 @@ Submitting a GPX file will compute the GPS based pace and distance. You may opti
 
 **Privacy**: This web application currently stores no information of any kind. The submitted file is encode as a base64 string which is then passed to the GpxRun class which computes the pace and distance in memory with no file caching. Nothing persists on the server.
 
-In a future state, there will be an opt-in to store store a hash of the file, the submitted distance,the computed distance, and the error as I am curious on overall statistics of GPS vs pedometer accuracy.
+In a future state, there will be an opt-in to store store a hash of the file, the submitted distance,the computed distance, and the percent error as I am curious on overall statistics of GPS vs pedometer accuracy.
