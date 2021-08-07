@@ -117,11 +117,15 @@ main_tab_content = html.Div([
                 persistence_type='memory',
                 placeholder='Enter Pedometer/Watch workout distance in miles',
             ),
-            dbc.Button('Submit', id='submit_button'),
+            dbc.Button('Process File for Summary', id='submit_button'),
         ]),
     ]),
     dcc.Loading(
-        children=[html.Div(id='output-data-upload')],
+        children=[
+            html.Button("Download Full CSV", id="btn_csv"),
+            dcc.Download(id="download-dataframe-csv"),
+            html.Div(id='output-data-upload')
+        ],
         id='loading-output-1',
         type='circle',
     ),
@@ -144,28 +148,41 @@ def decimal_minutes_to_minutes_seconds(decimal_minutes):
     return minutes, decimal_seconds
 
 
+def make_dataframe(
+    content_string,
+    filename,
+    distance_input,
+    return_full=False,
+):
+    decoded = base64.b64decode(content_string)
+
+    try:
+        if filename.endswith('.gpx.gz'):
+            gprun = GpxRun(io.StringIO(
+                gzip.decompress(decoded).decode('utf-8')),
+                           silent=True)
+            if not return_full:
+                return gprun.summary_data
+            else:
+                return gprun.gpx_data
+        elif filename.endswith('.gpx'):
+            # Assume that the user uploaded a GPX file
+            gprun = GpxRun(io.StringIO(decoded.decode('utf-8')), silent=True)
+            if not return_full:
+                return gprun.summary_data
+            else:
+                return gprun.gpx_data
+    except Exception as e:
+        print(e)
+
+
 def parse_contents(contents, filename, distance_input):
     content_type, content_string = contents.split(',')
-
-    #save_file(filename, contents)
-    decoded = base64.b64decode(content_string)
     if distance_input:
         dist = float(distance_input)
     else:
         dist = NaN
-    try:
-        if filename.endswith('.gpx.gz'):
-            df = GpxRun(io.StringIO(gzip.decompress(decoded).decode('utf-8')),
-                        silent=True).summary_data
-        elif filename.endswith('.gpx'):
-            # Assume that the user uploaded a GPX file
-            df = GpxRun(io.StringIO(decoded.decode('utf-8')),
-                        silent=True).summary_data
-        else:
-            return html.Div(['Must upload a .gpx or .gpx.gz file'])
-    except Exception as e:
-        print(e)
-        return html.Div(['There was an error processing this file.'])
+    df = make_dataframe(content_string, filename, dist)
     data_dict = df.to_dict(orient='records')[0]
 
     df = df.reset_index().transpose().reset_index().tail(-1)
@@ -217,14 +234,31 @@ def update_upload_text(file_name):
     return html.Div(['Drag and Drop or ', html.A('Select a GPX File')])
 
 
-@app.callback(Output('output-data-upload', 'children'),
-              Input('submit_button', 'n_clicks'),
-              State('upload-data', 'contents'), State('upload-data',
-                                                      'filename'),
-              State('distance_input', 'value'))
+@app.callback(
+    Output('output-data-upload', 'children'),
+    Input('submit_button', 'n_clicks'),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    State('distance_input', 'value'),
+)
 def update_output(_, content, name, distance_input):
     if content:
         return parse_contents(content, name, distance_input)
+
+
+@app.callback(
+    Output("download-dataframe-csv", "data"),
+    Input("btn_csv", "n_clicks"),
+    State('upload-data', 'contents'),
+    State('upload-data', 'filename'),
+    prevent_initial_call=True,
+)
+def func(n_clicks, contents, filename):
+    _, content_string = contents.split(',')
+
+    return dcc.send_data_frame(
+        make_dataframe(content_string, filename, None,
+                       return_full=True).to_csv, "file.csv")
 
 
 if __name__ == '__main__':
