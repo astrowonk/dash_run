@@ -83,8 +83,6 @@ main_text = """
 
 This site calculates pace and distance of a workout from a GPX file using the time and GPS latitude/longitude. It is powered by [gpxrun](https://github.com/astrowonk/gpxrun) and [gpxcsv](https://pypi.org/project/gpxcsv/) and built on the [Dash](https://dash.plotly.com) framework.
 
-I'm not sure about other workout/fitness trackers, but the Apple Watch reports distance and pace based on the pedometer, not the GPS. While the Apple Watch [should calibrate itself using the GPS](https://support.apple.com/en-us/HT204516), I have seen about a 3% discrepancy between the Apple Fitness and the GPS for my runs.
-
 Submitting a GPX file will compute the GPS based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
 No data or files submitted are stored on this server. See the about tab for more information.
@@ -98,7 +96,7 @@ main_tab_content = html.Div([
         children=['Drag and Drop or ',
                   html.A('Select a File')],
         style={
-            'width': '100%',
+            'width': '60%',
             'height': '120px',
             'lineHeight': '100px',
             'borderWidth': '1px',
