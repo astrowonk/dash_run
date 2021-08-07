@@ -110,13 +110,16 @@ main_tab_content = html.Div([
         #  Allow multiple files to be uploaded
         multiple=False),
     html.Div([
-        dbc.Input(
-            id='distance_input',
-            style={'width': '50%'},
-            persistence=True,
-            placeholder='Enter Pedometer/Watch workout distance in miles',
-            persistence_type='session'),
-        dbc.Button('Submit', id='submit_button'),
+        dbc.FormGroup([
+            html.Label('Device Reported Mileage:'),
+            dbc.Input(
+                id='distance_input',
+                style={'width': '50%'},
+                persistence=True,
+                placeholder='Enter Pedometer/Watch workout distance in miles',
+                persistence_type='session'),
+            dbc.Button('Submit', id='submit_button'),
+        ]),
     ]),
     html.Div(id='output-data-upload'),
 ])
