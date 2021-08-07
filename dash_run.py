@@ -72,6 +72,8 @@ I'm not sure about other workout/fitness trackers, but the Apple Watch reports d
 
 Submitting a GPX file will compute the GPS based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
+No data or files submitted are stored on this server. See the about tab for more information.
+
 """
 
 main_tab_content = html.Div([
