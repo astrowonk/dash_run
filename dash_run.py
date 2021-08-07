@@ -50,9 +50,24 @@ def make_row2(data_dict_entry, col_names):
     ])
 
 
-app = dash.Dash(__name__,
-                external_stylesheets=[dbc.themes.BOOTSTRAP],
-                url_base_pathname='/gpxrun/')
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    url_base_pathname='/gpxrun/',
+    title='GPX Run Workout Analysis',
+    meta_tags=[{
+        'name': 'description',
+        'content': 'GPX File Workout Pace and Distance Analysis'
+    }, {
+        'name':
+        'keywords',
+        'content':
+        'gpx, workout, pace, distance, gps, Apple Watch, Garmin, calibration'
+    }, {
+        "name": "viewport",
+        "content": "width=device-width, initial-scale=1"
+    }])
+
 server = app.server
 
 with open("intro.md", "r") as myfile:
