@@ -3,6 +3,7 @@ import datetime
 import io
 import gzip
 from gpxrun import GpxRun
+from gpxcsv import make_new_file_name
 from numpy import nan_to_num, NaN
 
 import dash
@@ -85,18 +86,22 @@ This site calculates pace and distance of a workout from a GPX file using the ti
 
 Submitting a GPX file (or gzipped GPX file) will compute the *GPS* based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
-__No data or files submitted are stored or preserved on the server. See the about tab for more information__.
+Dowload Full CSV will return the full `gpx_data` dataframe from the `GpxRun` class.
+
+__No data or files submitted are stored or preserved on the server. See the About tab for more information__.
 
 """
-
-main_tab_content = html.Div([
+left_col = html.Div([
     dcc.Markdown(main_text, style=markdown_style),
+])
+
+right_col = html.Div([
     dcc.Upload(
         id='upload-data',
         children=['Drag and Drop or ',
                   html.A('Select a File')],
         style={
-            'width': '60%',
+            'width': '100%',
             'height': '70px',
             'lineHeight': '70px',
             'borderWidth': '1px',
@@ -109,20 +114,24 @@ main_tab_content = html.Div([
         multiple=False),
     html.Div([
         dbc.FormGroup([
-            html.Label('Device Reported Mileage:'),
+            html.Label('Enter Device Reported Distance in Miles (optional):'),
             dbc.Input(
                 id='distance_input',
-                style={'width': '50%'},
+                style={'width': '100%'},
                 persistence=True,
                 persistence_type='memory',
                 placeholder='Enter Pedometer/Watch workout distance in miles',
             ),
-            dbc.Button('Process File for Summary', id='submit_button'),
+            dbc.Button('Process File for Summary',
+                       id='submit_button',
+                       style={'width': '100%'}),
         ]),
     ]),
     dcc.Loading(
         children=[
-            html.Button("Download Full CSV", id="btn_csv"),
+            dbc.Button("Download Full CSV",
+                       id="btn_csv",
+                       style={'width': '100%'}),
             dcc.Download(id="download-dataframe-csv"),
             html.Div(id='output-data-upload')
         ],
@@ -130,6 +139,12 @@ main_tab_content = html.Div([
         type='circle',
     ),
 ])
+
+main_tab_content = html.Div(
+    [dbc.Row([
+        dbc.Col(left_col),
+        dbc.Col(right_col),
+    ])])
 about_tab_content = html.Div(dcc.Markdown(
     intro_text,
     style=markdown_style,
@@ -138,7 +153,10 @@ tabs = dbc.Tabs([
     dbc.Tab(main_tab_content, label="Home"),
     dbc.Tab(about_tab_content, label="About"),
 ])
-app.layout = html.Div(tabs)
+
+the_one_container = dbc.Container(tabs)
+
+app.layout = html.Div(the_one_container)
 
 
 def decimal_minutes_to_minutes_seconds(decimal_minutes):
@@ -258,7 +276,8 @@ def func(n_clicks, contents, filename):
 
     return dcc.send_data_frame(
         make_dataframe(content_string, filename, None,
-                       return_full=True).to_csv, "file.csv")
+                       return_full=True).to_csv,
+        make_new_file_name(filename, 'csv'))
 
 
 if __name__ == '__main__':
