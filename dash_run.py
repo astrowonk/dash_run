@@ -117,7 +117,7 @@ main_tab_content = html.Div([
                 style={'width': '50%'},
                 persistence=True,
                 placeholder='Enter Pedometer/Watch workout distance in miles',
-                persistence_type='session'),
+            ),
             dbc.Button('Submit', id='submit_button'),
         ]),
     ]),
