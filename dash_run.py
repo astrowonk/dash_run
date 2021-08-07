@@ -174,8 +174,8 @@ def parse_contents(contents, filename, distance_input):
     df.columns = ['Label', 'Value']
     df['Label'] = df['Label'].apply(clean_header_names)
     theMarkdown = f"""
-     ### GPS Based Mile Pace: {data_dict['pace_mile_string']}
-     ### Submitted Distance Error: {(100 * (dist - data_dict['total_distance_miles']) / dist):.2f}%
+     #### GPS Based Mile Pace: {data_dict['pace_mile_string']}
+     #### Submitted Distance Error: {(100 * (dist - data_dict['total_distance_miles']) / dist):.2f}%
      
      * GPS Based Distance: 
           - {data_dict['total_distance_miles']:.2f} miles
@@ -193,7 +193,7 @@ def parse_contents(contents, filename, distance_input):
                          'font-family': 'monospace',
                          'font-size': 18
                      }),
-        html.H3('Splits'),
+        html.H4('Splits'),
         html.Ul([
             html.
             Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val):>9}"
@@ -201,7 +201,7 @@ def parse_contents(contents, filename, distance_input):
         ],
                 style={
                     'font-family': 'monospace',
-                    'font-size': 24
+                    'font-size': 20
                 }),
         html.Hr(),  # horizontal line
     ])
