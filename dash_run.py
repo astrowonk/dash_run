@@ -122,7 +122,11 @@ main_tab_content = html.Div([
             dbc.Button('Submit', id='submit_button'),
         ]),
     ]),
-    html.Div(id='output-data-upload'),
+    dcc.Loading(
+        children=[html.Div(id='output-data-upload')],
+        id='loading-output-1',
+        type='circle',
+    ),
 ])
 about_tab_content = html.Div(dcc.Markdown(
     intro_text,
