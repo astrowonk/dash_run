@@ -194,19 +194,17 @@ def parse_contents(contents, filename, distance_input):
                          'font-size': 18
                      }),
         html.H4('Splits'),
-        html.Ul([
-            html.
-            Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val):>9}"
-               ) for key, val in data_dict.items() if 'split' in key
-        ],
-                style={
-                    'font-family': 'monospace',
-                    'font-size': 18
-                },
-                style={
-                    'font-family': 'monospace',
-                    'font-size': 20
-                }),
+        html.Ul(
+            [
+                html.
+                Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val):>9}"
+                   ) for key, val in data_dict.items() if 'split' in key
+            ],
+            style={
+                'font-family': 'monospace',
+                'font-size': 18
+            },
+        ),
         html.Hr(),  # horizontal line
     ])
 
