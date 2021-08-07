@@ -191,7 +191,7 @@ def parse_contents(contents, filename, distance_input):
         dcc.Markdown(theMarkdown,
                      style={
                          'font-family': 'monospace',
-                         'font-size': 24
+                         'font-size': 18
                      }),
         html.H3('Splits'),
         html.Ul([
