@@ -201,6 +201,10 @@ def parse_contents(contents, filename, distance_input):
         ],
                 style={
                     'font-family': 'monospace',
+                    'font-size': 18
+                },
+                style={
+                    'font-family': 'monospace',
                     'font-size': 20
                 }),
         html.Hr(),  # horizontal line
