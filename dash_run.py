@@ -58,11 +58,24 @@ server = app.server
 with open("intro.md", "r") as myfile:
     intro_text = myfile.readlines()
 
-app.layout = html.Div([
-    dcc.Markdown(intro_text, style={
-        "width": "80%",
-        'margin': '10px'
-    }),
+markdown_style = {
+    "width": "80%",
+    'margin': '10px',
+}
+
+main_text = """
+### GPX Based Workout Summary
+
+This site calculates pace and distance of a workout from a GPX file using the time and GPS latitude/longitude. It is powered by [gpxrun](https://github.com/astrowonk/gpxrun) and [gpxcsv](https://pypi.org/project/gpxcsv/) and built on the [Dash](https://dash.plotly.com) framework.
+
+I'm not sure about other workout/fitness trackers, but the Apple Watch reports distance and pace based on the pedometer, not the GPS. While the Apple Watch [should calibrate itself using the GPS](https://support.apple.com/en-us/HT204516), I have seen about a 3% discrepancy between the Apple Fitness and the GPS for my runs.
+
+Submitting a GPX file will compute the GPS based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
+
+"""
+
+main_tab_content = html.Div([
+    dcc.Markdown(main_text, style=markdown_style),
     dcc.Upload(
         id='upload-data',
         children=['Drag and Drop or ',
@@ -90,6 +103,15 @@ app.layout = html.Div([
     ]),
     html.Div(id='output-data-upload'),
 ])
+about_tab_content = html.Div(dcc.Markdown(
+    intro_text,
+    style=markdown_style,
+))
+tabs = dbc.Tabs([
+    dbc.Tab(main_tab_content, label="Home"),
+    dbc.Tab(about_tab_content, label="About"),
+])
+app.layout = html.Div(tabs)
 
 
 def decimal_minutes_to_minutes_seconds(decimal_minutes):
@@ -167,7 +189,7 @@ def parse_contents(contents, filename, distance_input):
 def update_upload_text(file_name):
     if file_name:
         return html.Div(file_name)
-    return html.Div(['Drag and Drop or ', html.A('Select a File')])
+    return html.Div(['Drag and Drop or ', html.A('Select a GPX File')])
 
 
 @app.callback(Output('output-data-upload', 'children'),
