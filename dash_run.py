@@ -97,8 +97,8 @@ main_tab_content = html.Div([
                   html.A('Select a File')],
         style={
             'width': '60%',
-            'height': '120px',
-            'lineHeight': '100px',
+            'height': '70px',
+            'lineHeight': '50px',
             'borderWidth': '1px',
             'borderStyle': 'dashed',
             'borderRadius': '15px',
