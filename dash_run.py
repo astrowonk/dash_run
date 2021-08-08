@@ -125,13 +125,13 @@ right_col = html.Div([
             dbc.Button('Process File for Summary',
                        id='submit_button',
                        style={'width': '100%'}),
+            dbc.Button("Download Full CSV",
+                       id="btn_csv",
+                       style={'width': '100%'}),
         ]),
     ]),
     dcc.Loading(
         children=[
-            dbc.Button("Download Full CSV",
-                       id="btn_csv",
-                       style={'width': '100%'}),
             dcc.Download(id="download-dataframe-csv"),
             html.Div(id='output-data-upload')
         ],
