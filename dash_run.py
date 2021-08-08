@@ -124,7 +124,11 @@ right_col = html.Div([
             ),
             dbc.Button('Process File for Summary',
                        id='submit_button',
-                       style={'width': '100%'}),
+                       style={
+                           'width': '100%',
+                           'margin-bottom': '10px',
+                           'margin-top': '10px'
+                       }),
             dbc.Button("Download Full CSV",
                        id="btn_csv",
                        style={'width': '100%'}),
