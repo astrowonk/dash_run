@@ -13,11 +13,11 @@ with open("intro.md", "r") as myfile:
 main_text = """
 ### GPX Based Workout Summary
 
-This site calculates pace and distance of a workout from a GPX file using the time and GPS latitude/longitude. It is powered by [gpxrun](https://github.com/astrowonk/gpxrun) and [gpxcsv](https://pypi.org/project/gpxcsv/) and built on the [Dash](https://dash.plotly.com) framework.
+This web app calculates pace and distance of a workout from a GPX file using the time and GPS latitude/longitude. It is powered by [gpxrun](https://github.com/astrowonk/gpxrun) and [gpxcsv](https://pypi.org/project/gpxcsv/) and built on the [Dash](https://dash.plotly.com) framework.
 
 Submitting a GPX file (or gzipped GPX file) will compute the *GPS* based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
-Dowload Full CSV will return the full `gpx_data` dataframe from the `GpxRun` class.
+Dowload Full CSV will return the full `gpx_data` dataframe from the `GpxRun` class. This is augmented from the [gpxcsv](https://pypi.org/project/gpxcsv/) GPX file with additional columns such as cummulative distance, rolling average speed/pace, etc.
 
 __No data or files submitted are stored or preserved on the server. See the About tab for more information__.
 
