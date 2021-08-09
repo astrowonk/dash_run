@@ -3,7 +3,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 
 markdown_style = {
-    "width": "80%",
+    "width": "100%",
     'margin': '10px',
 }
 
@@ -24,9 +24,6 @@ __No data or files submitted are stored or preserved on the server. See the Abou
 """
 left_col = html.Div([
     dcc.Markdown(main_text, style=markdown_style),
-])
-
-right_col = html.Div([
     dcc.Upload(
         id='upload-data',
         children=['Drag and Drop or ',
@@ -52,19 +49,16 @@ right_col = html.Div([
                 persistence=True,
                 persistence_type='memory',
                 placeholder='Enter Pedometer/Watch workout distance in miles',
+                debounce=True,
             ),
-            dbc.Button('Process File for Summary',
-                       id='submit_button',
-                       style={
-                           'width': '100%',
-                           'margin-bottom': '10px',
-                           'margin-top': '10px'
-                       }),
             dbc.Button("Download Full CSV",
                        id="btn_csv",
                        style={'width': '100%'}),
         ]),
-    ]),
+    ])
+])
+
+right_col = html.Div([
     dcc.Loading(
         children=[
             dcc.Download(id="download-dataframe-csv"),
@@ -73,6 +67,7 @@ right_col = html.Div([
         id='loading-output-1',
         type='circle',
     ),
+    html.Div(id='distance-comparison-div')
 ])
 
 main_tab_content = html.Div(
@@ -89,4 +84,5 @@ tabs = dbc.Tabs([
     dbc.Tab(about_tab_content, label="About"),
 ])
 
-layout = dbc.Container(tabs)
+layout = dbc.Container(
+    [dcc.Store(id='summary_data', storage_type='memory'), tabs])

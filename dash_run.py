@@ -5,6 +5,7 @@ import gzip
 from gpxrun import GpxRun
 from gpxcsv import make_new_file_name
 from numpy import nan_to_num, NaN
+import pandas as pd
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -56,6 +57,7 @@ def make_row2(data_dict_entry, col_names):
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
+    prevent_initial_callbacks=True,
     url_base_pathname='/gpxrun/',
     title='GPX Run Workout Analysis',
     meta_tags=[{
@@ -86,7 +88,6 @@ def decimal_minutes_to_minutes_seconds(decimal_minutes):
 def make_dataframe(
     content_string,
     filename,
-    distance_input,
     return_full=False,
 ):
     decoded = base64.b64decode(content_string)
@@ -111,30 +112,28 @@ def make_dataframe(
         print(e)
 
 
-def parse_contents(contents, filename, distance_input):
-    content_type, content_string = contents.split(',')
-    if distance_input:
-        dist = float(distance_input)
-    else:
-        dist = NaN
-    df = make_dataframe(content_string, filename, dist)
+def parse_contents(contents, filename):
+    _, content_string = contents.split(',')
+
+    df = make_dataframe(content_string, filename)
     data_dict = df.to_dict(orient='records')[0]
 
     df = df.reset_index().transpose().reset_index().tail(-1)
     df.columns = ['Label', 'Value']
     df['Label'] = df['Label'].apply(clean_header_names)
     theMarkdown = f"""
-     __Workout Start Time: {data_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}__ {data_dict.get('type','').title()}
-     #### GPS Based Mile Pace: {data_dict['pace_mile_string']}
-     #### Submitted Distance Error: {(100 * (dist - data_dict['total_distance_miles']) / dist):.2f}%
-     
+     __Start Time: {data_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}__     
+
+    {data_dict.get('type','').title()}
+ 
+    ##### GPS Based Mile Pace: {data_dict['pace_mile_string']}
+
+
+     Total Time: {GpxRun.decimal_minutes_to_formatted_string(data_dict['total_time_minutes'])}
      * GPS Based Distance: 
           - {data_dict['total_distance_miles']:.2f} miles
           - {data_dict['total_distance_meters']:.2f} meters
-     * Submitted Distance: 
-          - {dist:.2f} miles
-          - {dist * 1609.34:.2f} meters
-     * Total Time: {GpxRun.decimal_minutes_to_formatted_string(data_dict['total_time_minutes'])}"
+
 
      """
 
@@ -142,9 +141,9 @@ def parse_contents(contents, filename, distance_input):
         dcc.Markdown(theMarkdown,
                      style={
                          'font-family': 'monospace',
-                         'font-size': 18
+                         'font-size': 16
                      }),
-        html.H4('Splits'),
+        html.P('Splits'),
         html.Ul(
             [
                 html.
@@ -153,11 +152,11 @@ def parse_contents(contents, filename, distance_input):
             ],
             style={
                 'font-family': 'monospace',
-                'font-size': 18
+                'font-size': 14
             },
         ),
         html.Hr(),  # horizontal line
-    ])
+    ]), data_dict
 
 
 @app.callback(
@@ -171,15 +170,16 @@ def update_upload_text(file_name):
 
 
 @app.callback(
-    Output('output-data-upload', 'children'),
-    Input('submit_button', 'n_clicks'),
-    State('upload-data', 'contents'),
+    [Output('output-data-upload', 'children'),
+     Output('summary_data', 'data')],
+    Input('upload-data', 'contents'),
     State('upload-data', 'filename'),
-    State('distance_input', 'value'),
 )
-def update_output(_, content, name, distance_input):
+def update_output(content, name):
     if content:
-        return parse_contents(content, name, distance_input)
+        return parse_contents(content, name)
+    else:
+        return [html.Div(['No file selected.']), {}]
 
 
 @app.callback(
@@ -196,6 +196,46 @@ def func(n_clicks, contents, filename):
         make_dataframe(content_string, filename, None,
                        return_full=True).to_csv,
         make_new_file_name(filename, 'csv'))
+
+
+@app.callback(Output('distance-comparison-div', 'children'),
+              Input('distance_input', 'value'), Input('summary_data', 'data'))
+def update_comparison_div(distance_input, data):
+    if data is None:
+        data = {}
+    if not distance_input:
+        return []
+    if distance_input:
+        dist = float(distance_input)
+    else:
+        dist = NaN
+
+    temp_df = pd.DataFrame([{
+        'Distance (meters)': dist * 1609.344,
+        'Source': 'Submitted'
+    }, {
+        'Distance (meters)':
+        data.get('total_distance_miles', 0) * 1609.344,
+        'Source':
+        "GPS"
+    }])
+    error = f"{(100 * (dist - data['total_distance_miles']) / dist):.2f}%"
+    theText = f"""
+    
+    Computed Distance Error: {error}
+    
+    """
+    return [
+        dcc.Markdown(theText),
+        dcc.Graph(
+            id='data_graph',
+            figure=temp_df.plot.bar(x='Distance (meters)',
+                                    y='Source',
+                                    orientation='h',
+                                    text='Distance (meters)',
+                                    backend='plotly'),
+        )
+    ]
 
 
 if __name__ == '__main__':
