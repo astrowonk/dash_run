@@ -124,6 +124,7 @@ def parse_contents(contents, filename, distance_input):
     df.columns = ['Label', 'Value']
     df['Label'] = df['Label'].apply(clean_header_names)
     theMarkdown = f"""
+     __Workout Start Time: {data_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}__ {data_dict.get('type','').title()}
      #### GPS Based Mile Pace: {data_dict['pace_mile_string']}
      #### Submitted Distance Error: {(100 * (dist - data_dict['total_distance_miles']) / dist):.2f}%
      
