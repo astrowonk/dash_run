@@ -81,9 +81,9 @@ left_col = html.Div([
                   html_for="data-opt-in",
                   id='checkbox-description'),
         dbc.Tooltip(
-            "Opt-in to log one-way hash of the filename, the total GPS distance, device type, and the submitted distance for statistical analysis.",
+            "Opt-in to log one-way hash of the filename, the total GPS distance, user submitted distance, and device information for statistical analysis.",
             target='checkbox-description',
-            placement='bottom')
+            placement='right')
     ])
 ])
 

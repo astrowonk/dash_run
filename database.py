@@ -11,6 +11,5 @@ class DatabaseInterface():
         con = sqlite3.connect(self.database_name)
         cur = con.cursor()
         query = f"""insert or replace into calib (file_hash,gps_distance_miles,user_distance_miles,device_type) VALUES ("{hash}",{gps_distance},{submitted_distance},"{device_type}");"""
-        print(query)
         cur.execute(query)
         con.commit()
