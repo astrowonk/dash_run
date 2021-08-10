@@ -15,9 +15,9 @@ main_text = """
 
 This web app calculates pace and distance of a workout from a GPX file using the time and GPS latitude/longitude. It is powered by [gpxrun](https://github.com/astrowonk/gpxrun) and [gpxcsv](https://pypi.org/project/gpxcsv/) and built on the [Dash](https://dash.plotly.com) framework.
 
-Submitting a GPX file (or gzipped GPX file) will compute the *GPS* based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
+Submitting a GPX file (or gzipped GPX file) will compute the __GPS__ based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
-__No data or files submitted are stored or preserved on the server. See the About tab for more information__.
+__Neither the GPX file nor the converted CSV data are stored or preserved on the server. See the About tab for more information__.
 
 """
 left_col = html.Div([
@@ -42,16 +42,46 @@ left_col = html.Div([
         multiple=False),
     html.Div([
         dbc.FormGroup([
-            html.Label('Enter Device Reported Distance in Miles (optional):'),
+            html.Label('Enter Device Reported Distance(optional):'),
             dbc.Input(
-                id='distance_input',
-                style={'width': '100%'},
+                id='distance-input',
                 persistence=True,
                 persistence_type='memory',
                 placeholder='Enter Pedometer/Watch workout distance in miles',
                 debounce=True,
-            ),
+            )
         ]),
+        dbc.FormGroup([
+            html.Label("Enter Device and Model Information (optional)"),
+            dcc.Dropdown(
+                id='device-type',
+                style={'margin-top': '10px'},
+                persistence=True,
+                persistence_type='memory',
+                placeholder='Enter Device Type',
+                options=[{
+                    'label': x,
+                    'value': x
+                } for x in ['Apple Watch', 'Garmin', 'Fitbit', 'Other']],
+            ),
+            dbc.Input(id='device-model', placeholder='Device Model', value=''),
+            dbc.Button(id='submit-distance-button',
+                       children='Submit',
+                       style={'margin-top': '10px'}),
+        ],
+                      style={
+                          'width': '50%',
+                      }),
+    ]),
+    dbc.FormGroup([
+        dbc.Checkbox(id='data-opt-in'),
+        dbc.Label("Share Summary Calibration Data",
+                  html_for="data-opt-in",
+                  id='checkbox-description'),
+        dbc.Tooltip(
+            "Opt-in to log one-way hash of the filename, the total GPS distance, device type, and the submitted distance for statistical analysis.",
+            target='checkbox-description',
+            placement='bottom')
     ])
 ])
 

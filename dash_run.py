@@ -210,8 +210,11 @@ def func(n_clicks, contents, filename):
 
 
 @app.callback(Output('distance-comparison-div', 'children'),
-              Input('distance_input', 'value'), Input('summary_data', 'data'))
-def update_comparison_div(distance_input, data):
+              Input('submit-distance-button', 'n_clicks'),
+              State('distance-input', 'value'), State('summary_data', 'data'))
+def update_comparison_div(n_clicks, distance_input, data):
+    if not n_clicks:
+        return dash.no_update
     if data is None:
         return dash.no_update
     if not distance_input:
@@ -241,19 +244,22 @@ def update_comparison_div(distance_input, data):
 
 @app.callback(Output('dummy', 'children'),
               Input('distance-comparison-div', 'children'),
-              State('distance_input', 'value'), State('summary_data', 'data'),
+              State('distance-input', 'value'), State('summary_data', 'data'),
               State('upload-data', 'contents'), State('upload-data',
-                                                      'filename'))
-def save_hashed_stat_data(_, distance_input, data, contents, filename):
+                                                      'filename'),
+              State('device-type', 'value'), State('data-opt-in', 'checked'),
+              State('device-model', 'value'))
+def save_hashed_stat_data(_, distance_input, data, contents, filename,
+                          device_type, data_opt_in, device_model):
+    if not data_opt_in:
+        return dash.no_update
     if not distance_input:
         return dash.no_update
     print("This is the test save hashed stats method")
     _, content_string = contents.split(',')
 
     # I want the hash to be the same if it's submited as a gzip or as a plain gpx file
-    # of course hashing the file risks that like a change in one character or a space
-    # could alter the hash. Maybe hashing like the first 10 lat lon values would be better
-    # but we'll just go with this.
+    # so I decode it and gunzip it (if need be) before then hashing it.
 
     decoded = base64.b64decode(content_string)
 
@@ -267,8 +273,9 @@ def save_hashed_stat_data(_, distance_input, data, contents, filename):
     m = sha256()
     m.update(true_content)
     hashed_data = m.hexdigest()
+    device_model = device_model.replace(';', '').replace('"', '')
     dbi.insert_summary_data(hashed_data, data.get('total_distance_miles', 0),
-                            dist)
+                            dist, device_type + '+' + device_model)
     return dash.no_update
 
 
