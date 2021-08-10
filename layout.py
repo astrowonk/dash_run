@@ -74,7 +74,9 @@ left_col = html.Div([
                       }),
     ]),
     dbc.FormGroup([
-        dbc.Checkbox(id='data-opt-in'),
+        dbc.Checkbox(id='data-opt-in',
+                     persistence=True,
+                     persistence_type='session'),
         dbc.Label("Share Summary Calibration Data",
                   html_for="data-opt-in",
                   id='checkbox-description'),
