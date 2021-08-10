@@ -1,12 +1,13 @@
 import base64
-import datetime
 import io
 import gzip
 from gpxrun import GpxRun
 from gpxcsv import make_new_file_name
 from numpy import nan_to_num, NaN
 import pandas as pd
+from database import DatabaseInterface
 
+import config
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -15,6 +16,8 @@ import dash_bootstrap_components as dbc
 from hashlib import sha256
 
 from layout import layout
+
+dbi = DatabaseInterface(database_name=config.db_name)
 
 app = dash.Dash(
     __name__,
@@ -239,16 +242,33 @@ def update_comparison_div(distance_input, data):
 @app.callback(Output('dummy', 'children'),
               Input('distance-comparison-div', 'children'),
               State('distance_input', 'value'), State('summary_data', 'data'),
-              State('upload-data', 'contents'))
-def save_hashed_stat_data(_, distance_input, data, file_data):
+              State('upload-data', 'contents'), State('upload-data',
+                                                      'filename'))
+def save_hashed_stat_data(_, distance_input, data, contents, filename):
     if not distance_input:
         return dash.no_update
     print("This is the test save hashed stats method")
+    _, content_string = contents.split(',')
+
+    # I want the hash to be the same if it's submited as a gzip or as a plain gpx file
+    # of course hashing the file risks that like a change in one character or a space
+    # could alter the hash. Maybe hashing like the first 10 lat lon values would be better
+    # but we'll just go with this.
+
+    decoded = base64.b64decode(content_string)
+
+    if filename.endswith('.gpx.gz'):
+        true_content = gzip.decompress(decoded)
+    elif filename.endswith('.gpx'):
+        # Assume that the user uploaded a GPX file
+        true_content = decoded
+
     dist = float(distance_input)
-    _, content_string = file_data.split(',')
     m = sha256()
-    m.update(content_string.encode('utf-8'))
+    m.update(true_content)
     hashed_data = m.hexdigest()
+    dbi.insert_summary_data(hashed_data, data.get('total_distance_miles', 0),
+                            dist)
     return dash.no_update
 
 
