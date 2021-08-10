@@ -12,6 +12,7 @@ from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from hashlib import sha256
 
 from layout import layout
 
@@ -233,6 +234,23 @@ def update_comparison_div(distance_input, data):
         make_table_from_df2(temp_df)
     ],
                     style={'margin': '15px'})
+
+
+@app.callback(Output('dummy', 'children'),
+              Input('distance-comparison-div', 'children'),
+              State('distance_input', 'value'), State('summary_data', 'data'),
+              State('upload-data', 'contents'))
+def save_hashed_stat_data(_, distance_input, data, file_data):
+    if not distance_input:
+        return dash.no_update
+    print("This is the test save hashed stats method")
+    dist = float(distance_input)
+    _, content_string = file_data.split(',')
+    m = sha256()
+    m.update(content_string.encode('utf-8'))
+    hashed_data = m.hexdigest()
+    print(hashed_data, dist, data.get('total_distance_miles'))
+    return dash.no_update
 
 
 if __name__ == '__main__':

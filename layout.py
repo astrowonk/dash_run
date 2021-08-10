@@ -59,7 +59,9 @@ right_col = html.Div([
     dcc.Loading(
         children=[
             dcc.Download(id="download-dataframe-csv"),
-            html.Div(id='output-data-upload')
+            html.Div(id='output-data-upload',
+                     children=html.P("Waiting for GPX FIle"),
+                     style=markdown_style)
         ],
         id='loading-output-1',
         type='circle',
@@ -81,5 +83,8 @@ tabs = dbc.Tabs([
     dbc.Tab(about_tab_content, label="About"),
 ])
 
-layout = dbc.Container(
-    [dcc.Store(id='summary_data', storage_type='memory'), tabs])
+layout = dbc.Container([
+    dcc.Store(id='summary_data', storage_type='memory'),
+    tabs,
+    html.Div(id='dummy'),
+])
