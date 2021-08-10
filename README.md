@@ -4,4 +4,3 @@ This is the source code to my [Dash app](https://dash.plotly.com) that processes
 
 It is [deployed and running on my website](https://marcoshuerta.com/gpxrun/).
 
-![Screen Shot 2021-08-07 at 3 01 41 PM](https://user-images.githubusercontent.com/13702392/128611230-3742a3b9-0e0d-422f-8bd1-bd8f15e20819.png)
