@@ -66,7 +66,7 @@ left_col = html.Div([
             ),
             dbc.Input(id='device-model', placeholder='Device Model', value=''),
             dbc.Button(id='submit-distance-button',
-                       children='Submit',
+                       children='Submit Device Info and Distance',
                        style={'margin-top': '10px'}),
         ],
                       style={
@@ -81,7 +81,7 @@ left_col = html.Div([
                   html_for="data-opt-in",
                   id='checkbox-description'),
         dbc.Tooltip(
-            "Opt-in to log one-way hash of the filename, the total GPS distance, user submitted distance, and device information for statistical analysis.",
+            "Opt-in to share one-way hash of the GPX file, the total GPS distance, user submitted distance, and device information for statistical analysis.",
             target='checkbox-description',
             placement='right')
     ])
