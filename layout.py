@@ -17,8 +17,6 @@ This web app calculates pace and distance of a workout from a GPX file using the
 
 Submitting a GPX file (or gzipped GPX file) will compute the *GPS* based pace and distance. You may optionally submit the distance in miles that is reported by Apple Fitness or whatever device you have. This will be used to compute the GPS based error of your fitness tracker/device.
 
-Dowload Full CSV will return the full `gpx_data` dataframe from the `GpxRun` class. This is augmented from the [gpxcsv](https://pypi.org/project/gpxcsv/) GPX file with additional columns such as cummulative distance, rolling average speed/pace, etc.
-
 __No data or files submitted are stored or preserved on the server. See the About tab for more information__.
 
 """
@@ -26,8 +24,10 @@ left_col = html.Div([
     dcc.Markdown(main_text, style=markdown_style),
     dcc.Upload(
         id='upload-data',
-        children=['Drag and Drop or ',
-                  html.A('Select a File')],
+        children=[
+            'Drag and Drop or ',
+            html.A('Select a .gpx or .gpx.gz File')
+        ],
         style={
             'width': '100%',
             'height': '70px',
@@ -51,9 +51,6 @@ left_col = html.Div([
                 placeholder='Enter Pedometer/Watch workout distance in miles',
                 debounce=True,
             ),
-            dbc.Button("Download Full CSV",
-                       id="btn_csv",
-                       style={'width': '100%'}),
         ]),
     ])
 ])

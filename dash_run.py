@@ -15,6 +15,33 @@ import dash_bootstrap_components as dbc
 
 from layout import layout
 
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    prevent_initial_callbacks=True,
+    suppress_callback_exceptions=True,
+    url_base_pathname='/gpxrun/',
+    title='GPX Run Workout Analysis',
+    meta_tags=[{
+        'name':
+        'description',
+        'content':
+        'GPX File Workout Pace and Distance Analysis, GPX to CSV Converter'
+    }, {
+        'name':
+        'keywords',
+        'content':
+        'gpx, workout, pace, distance, gps, Apple Watch, Garmin, calibration, gps converter, csv'
+    }, {
+        "name": "viewport",
+        "content": "width=device-width, initial-scale=1"
+    }],
+)
+
+server = app.server
+
+app.layout = html.Div(layout)
+
 
 def clean_header_names(x):
     return x.replace('_', ' ').title()
@@ -52,30 +79,6 @@ def make_row2(data_dict_entry, col_names):
         html.Td(process_cell_links(x, link_names)) for x in col_names
         if not x.endswith('_HREF')
     ])
-
-
-app = dash.Dash(
-    __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
-    prevent_initial_callbacks=True,
-    url_base_pathname='/gpxrun/',
-    title='GPX Run Workout Analysis',
-    meta_tags=[{
-        'name': 'description',
-        'content': 'GPX File Workout Pace and Distance Analysis'
-    }, {
-        'name':
-        'keywords',
-        'content':
-        'gpx, workout, pace, distance, gps, Apple Watch, Garmin, calibration'
-    }, {
-        "name": "viewport",
-        "content": "width=device-width, initial-scale=1"
-    }])
-
-server = app.server
-
-app.layout = html.Div(layout)
 
 
 def decimal_minutes_to_minutes_seconds(decimal_minutes):
@@ -122,9 +125,7 @@ def parse_contents(contents, filename):
     df.columns = ['Label', 'Value']
     df['Label'] = df['Label'].apply(clean_header_names)
     theMarkdown = f"""
-     __Start Time: {data_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}__     
-
-    {data_dict.get('type','').title()}
+     __Start Time: {data_dict['start_time'].strftime('%a %b %d %H:%m:%S %Z')}__ {data_dict.get('type','').title()}
  
     ##### GPS Based Mile Pace: {data_dict['pace_mile_string']}
 
@@ -138,11 +139,7 @@ def parse_contents(contents, filename):
      """
 
     return html.Div([
-        dcc.Markdown(theMarkdown,
-                     style={
-                         'font-family': 'monospace',
-                         'font-size': 16
-                     }),
+        dcc.Markdown(theMarkdown, className='markdown-text'),
         html.P('Splits'),
         html.Ul(
             [
@@ -150,12 +147,19 @@ def parse_contents(contents, filename):
                 Li(f"{clean_header_names(key).replace(' Split','')}: {GpxRun.decimal_minutes_to_formatted_string(val):>9}"
                    ) for key, val in data_dict.items() if 'split' in key
             ],
-            style={
-                'font-family': 'monospace',
-                'font-size': 14
-            },
+            style={'font-size': 14},
         ),
         html.Hr(),  # horizontal line
+        dbc.Button(
+            "Download Full CSV",
+            id="btn_csv",
+            style={'width': '100%'},
+        ),
+        dbc.Tooltip(
+            "The CSV will contain all original gpx data created by gpxcsv with additional computed columns from GpxRun",
+            target='btn_csv',
+            placement='bottom',
+        )
     ]), data_dict
 
 
@@ -190,11 +194,14 @@ def update_output(content, name):
     prevent_initial_call=True,
 )
 def func(n_clicks, contents, filename):
+    if not n_clicks:
+        #the download is triggering without the button being clicked for unknown reasons
+        return dash.no_update
     _, content_string = contents.split(',')
-
+    ctx = dash.callback_context
+    print([ctx.triggered[0]['prop_id'], ctx.triggered[0]['value'], ctx.inputs])
     return dcc.send_data_frame(
-        make_dataframe(content_string, filename, None,
-                       return_full=True).to_csv,
+        make_dataframe(content_string, filename, return_full=True).to_csv,
         make_new_file_name(filename, 'csv'))
 
 
@@ -202,7 +209,7 @@ def func(n_clicks, contents, filename):
               Input('distance_input', 'value'), Input('summary_data', 'data'))
 def update_comparison_div(distance_input, data):
     if data is None:
-        data = {}
+        return dash.no_update
     if not distance_input:
         return []
     if distance_input:
@@ -220,22 +227,12 @@ def update_comparison_div(distance_input, data):
         "GPS"
     }])
     error = f"{(100 * (dist - data['total_distance_miles']) / dist):.2f}%"
-    theText = f"""
-    
-    Computed Distance Error: {error}
-    
-    """
-    return [
-        dcc.Markdown(theText),
-        dcc.Graph(
-            id='data_graph',
-            figure=temp_df.plot.bar(x='Distance (meters)',
-                                    y='Source',
-                                    orientation='h',
-                                    text='Distance (meters)',
-                                    backend='plotly'),
-        )
-    ]
+
+    return html.Div([
+        html.H4(f"Computed Distance Error: {error}"),
+        make_table_from_df2(temp_df)
+    ],
+                    style={'margin': '15px'})
 
 
 if __name__ == '__main__':
