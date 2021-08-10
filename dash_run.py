@@ -211,8 +211,9 @@ def func(n_clicks, contents, filename):
 
 @app.callback(Output('distance-comparison-div', 'children'),
               Input('submit-distance-button', 'n_clicks'),
-              State('distance-input', 'value'), State('summary_data', 'data'))
-def update_comparison_div(n_clicks, distance_input, data):
+              State('distance-input', 'value'), State('summary_data', 'data'),
+              State('data-opt-in', 'checked'))
+def update_comparison_div(n_clicks, distance_input, data, opt_in):
     if not n_clicks:
         return dash.no_update
     if data is None:
@@ -234,10 +235,14 @@ def update_comparison_div(n_clicks, distance_input, data):
         "GPS"
     }])
     error = f"{(100 * (dist - data['total_distance_miles']) / dist):.2f}%"
+    thank_you_message = ''
+    if opt_in:
+        thank_you_message = "Thank you for sharing your summary data!"
 
     return html.Div([
         html.H4(f"Computed Distance Error: {error}"),
-        make_table_from_df2(temp_df)
+        make_table_from_df2(temp_df),
+        html.P(thank_you_message),
     ],
                     style={'margin': '15px'})
 
