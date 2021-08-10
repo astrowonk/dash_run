@@ -249,7 +249,6 @@ def save_hashed_stat_data(_, distance_input, data, file_data):
     m = sha256()
     m.update(content_string.encode('utf-8'))
     hashed_data = m.hexdigest()
-    print(hashed_data, dist, data.get('total_distance_miles'))
     return dash.no_update
 
 
