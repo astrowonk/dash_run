@@ -8,7 +8,7 @@ markdown_style = {
 }
 
 with open("intro.md", "r") as myfile:
-    intro_text = myfile.readlines()
+    intro_text = myfile.read()
 
 main_text = """
 ### GPX Based Workout Summary
