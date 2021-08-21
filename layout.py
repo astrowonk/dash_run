@@ -22,25 +22,27 @@ __Neither the GPX file nor the converted CSV data are stored or preserved on the
 """
 left_col = html.Div([
     dcc.Markdown(main_text, style=markdown_style),
-    dcc.Upload(
-        id='upload-data',
-        children=[
-            'Drag and Drop or ',
-            html.A('Select a .gpx or .gpx.gz File')
-        ],
-        style={
-            'width': '100%',
-            'height': '70px',
-            'lineHeight': '70px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '15px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        #  Allow multiple files to be uploaded
-        multiple=False),
     html.Div([
+        dbc.FormGroup([
+            dcc.Upload(
+                id='upload-data',
+                children=[
+                    'Drag and Drop or ',
+                    html.A('Select a .gpx or .gpx.gz File')
+                ],
+                style={
+                    #     'width': '100%',
+                    'height': '80px',
+                    #     'lineHeight': '70px',
+                    'borderWidth': '1px',
+                    'borderStyle': 'dashed',
+                    'borderRadius': '15px',
+                    'textAlign': 'center',
+                    'margin': '10px'
+                },
+                #  Allow multiple files to be uploaded
+                multiple=False),
+        ]),
         dbc.FormGroup([
             html.Label('Enter Device Reported Distance(optional):'),
             dbc.Input(
@@ -117,6 +119,6 @@ tabs = dbc.Tabs([
 
 layout = dbc.Container([
     dcc.Store(id='summary_data', storage_type='memory'),
-    tabs,
+    dbc.Row(dbc.Col((tabs))),
     html.Div(id='dummy'),
 ])
