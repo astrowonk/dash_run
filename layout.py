@@ -23,7 +23,7 @@ __Neither the GPX file nor the converted CSV data are stored or preserved on the
 left_col = html.Div([
     dcc.Markdown(main_text, style=markdown_style),
     html.Div([
-        dbc.FormGroup([
+        html.Div([
             dcc.Upload(
                 id='upload-data',
                 children=[
@@ -43,7 +43,7 @@ left_col = html.Div([
                 #  Allow multiple files to be uploaded
                 multiple=False),
         ]),
-        dbc.FormGroup([
+        html.Div([
             html.Label('Enter Device Reported Distance(optional):'),
             dbc.Input(
                 id='distance-input',
@@ -53,7 +53,7 @@ left_col = html.Div([
                 debounce=True,
             )
         ]),
-        dbc.FormGroup([
+        html.Div([
             html.Label("Enter Device and Model Information (optional)"),
             dcc.Dropdown(
                 id='device-type',
@@ -71,11 +71,11 @@ left_col = html.Div([
                        children='Submit Device Info and Distance',
                        style={'margin-top': '10px'}),
         ],
-                      style={
-                          'width': '50%',
-                      }),
+                 style={
+                     'width': '50%',
+                 }),
     ]),
-    dbc.FormGroup([
+    html.Div([
         dbc.Checkbox(id='data-opt-in',
                      persistence=True,
                      persistence_type='session'),
