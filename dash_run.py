@@ -19,12 +19,15 @@ from layout import layout
 
 dbi = DatabaseInterface(database_name=config.db_name)
 
+import os
+parent_dir = os.getcwd().split('/')[-1]
+
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     prevent_initial_callbacks=True,
     suppress_callback_exceptions=True,
-    url_base_pathname='/gpxrun/',
+    url_base_pathname=f'/dash/{parent_dir}',
     title='GPX Run Workout Analysis',
     meta_tags=[{
         'name':
