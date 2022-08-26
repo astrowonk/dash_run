@@ -27,7 +27,7 @@ app = dash.Dash(
     external_stylesheets=[dbc.themes.BOOTSTRAP],
     prevent_initial_callbacks=True,
     suppress_callback_exceptions=True,
-    url_base_pathname=f'/dash/{parent_dir}',
+    url_base_pathname=f'/dash/{parent_dir}/',
     title='GPX Run Workout Analysis',
     meta_tags=[{
         'name':
